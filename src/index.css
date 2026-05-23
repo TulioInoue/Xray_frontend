@@ -1,0 +1,48 @@
+:root {
+  --primary-color: #1c3148;
+  --primary-light-color: #26415d;
+  --primary-hover-color: #4978ab;
+  --secondary-color: #c56715;
+  --secondary-light-color: #d27321;
+  --secondary-hover-color: #e48633;
+  --background-color: #ffffff;
+  --text-dark-color: #212529;
+  --text-gray-color: #717a83;
+  --text-light-color: #eeeeee;
+}
+
+body {
+  width: 100vw;
+  height: 100dvh;
+  font-family: system-ui;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+* {
+  padding: 0px;
+  margin: 0px;
+  box-sizing: border-box;
+  font-size: 62.5%;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+  border: 3px solid #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+html {
+  overflow-x: hidden;
+}
