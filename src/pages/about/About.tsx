@@ -12,7 +12,7 @@ export default function About() {
         <p>
           By utilizing a public clinical dataset from{" "}
           <a
-            href="https://www.kaggle.com/datasets/andrewmvd/early-diabetes-classification"
+            href="https://www.kaggle.com/datasets/nih-chest-xrays/data"
             target="_blank"
           >
             Kaggle
@@ -28,107 +28,112 @@ export default function About() {
         <h3>Dataset and Clinical Context</h3>
         <p>
           The foundational backbone of this predictive system is the{" "}
-          <strong>Early Stage Diabetes Risk Prediction Dataset</strong>, sourced
-          from the{" "}
+          <strong>NIH Chest X-rays</strong>, sourced from the{" "}
           <a
-            href="https://www.kaggle.com/datasets/andrewmvd/early-diabetes-classification"
+            href="https://www.kaggle.com/datasets/nih-chest-xrays/data"
             target="_blank"
           >
             Kaggle
           </a>{" "}
-          repository. The dataset contains clinical signs and symptoms collected
-          from patients who have either been diagnosed as diabetic or are
-          presenting pre-diabetic risk factors.
+          repository. The dataset contains clinical x-ray images from patients
+          suffering from 14 differents classes:
         </p>
+        <div>
+          <img src="/images/diagnosis.png" alt="x-ray classes" />
+        </div>
         <div>
           <h4>Feature Inventory</h4>
           <p>
-            The model evaluates a comprehensive suite of dempographic data and
-            symptoms:
+            The model evaluates images and evaluates 13 differents diagnosis:
           </p>
           <ul>
             <li>
               <p>
-                <strong>Age:</strong> numerical baseline ranging from
-                symptomatic youth to high-risk older demographics.
+                <strong>Atelectasis:</strong> partial or complete collapse of a
+                lung or a specific section (lobe) of a lung.
               </p>
             </li>
             <li>
               <p>
-                <strong>Polyuria:</strong> excessive urination, a primary
-                indicator of high blood glucose levels.
+                <strong>Cardiomegaly:</strong> it is not a disease itself, but
+                rather a sign of an underlying condition that forces the heart
+                to work harder or causes the heart muscle to stretch and
+                thicken.
               </p>
             </li>
             <li>
               <p>
-                <strong>Polydipsia:</strong> excessive thirst, resulting from
-                systemic dehydration caused by polyuria.
+                <strong>Consolidation:</strong> a lung condition where normally
+                air-filled lung tissue becomes stiff and filled with fluid,
+                cells, or pus.
               </p>
             </li>
             <li>
               <p>
-                <strong>Sudden Weight Loss:</strong> rapid depletion of muscle
-                and fat stores due to cellular starvation.
+                <strong>Edema:</strong> a serious medical condition
+                characterized by an abnormal buildup of excess fluid in the
+                lungs' air sacs (alveoli).
               </p>
             </li>
             <li>
               <p>
-                <strong>Weakness:</strong> systemic fatigue caused by the body's
-                inability to metabolize glucose efficiently.
+                <strong>Effusion:</strong> abnormal buildup of excess fluid in
+                the space between your lungs and your chest cavity.
               </p>
             </li>
             <li>
               <p>
-                <strong>Polyphasia:</strong> increased appetite or excessive
-                hunger.
+                <strong>Emphysema:</strong> a chronic, progressive lung disease
+                where the tiny air sacs (alveoli) in your lungs are permanently
+                damaged and destroyed.
               </p>
             </li>
             <li>
               <p>
-                <strong>Genital Thrush:</strong> fungal infections associated
-                with elevated glucose in bodily fluids.
+                <strong>Fibrosis:</strong> a progressive lung disease
+                characterized by irreversible scarring (fibrosis) of the tissue
+                between the air sacs in the lungs.
               </p>
             </li>
             <li>
               <p>
-                <strong>Visual Blurring:</strong>
-                temporary distortion of eye lenses due to high blood sugar.
+                <strong>Infiltration:</strong> an accumulation of abnormal
+                substances—such as fluid, pus, blood, immune cells, or
+                proteins—in the air sacs and tissues of the lungs.
               </p>
             </li>
             <li>
               <p>
-                <strong>Itching:</strong> generalized pruritus linked to poor
-                peripheral circulation and dry skin.
+                <strong>Mass:</strong> an abnormal growth or lesion inside the
+                lung that measures larger than 3 centimeters (about 1.2 inches)
+                in diameter.
               </p>
             </li>
             <li>
               <p>
-                <strong>Delayed Healing:</strong> impaired immune response and
-                vascular degradation delaying wound recovery.
+                <strong>Nodule:</strong> a small, round, or oval-shaped abnormal
+                growth of tissue in the lung. Often called a "spot on the lung,"
+                it typically measures or less in diameter.
               </p>
             </li>
             <li>
               <p>
-                <strong>Partial Parensis:</strong> Muscle weakness resulting
-                from diabetic neuropathy.
+                <strong>Pleural Thickening:</strong> is the scarring, hardening,
+                or inflammation of the pleura.
               </p>
             </li>
             <li>
               <p>
-                <strong>Muscle Stiffness:</strong> systemic joint and muscular
-                rigidity.
+                <strong>Pneumonia:</strong> an infection that inflames the air
+                sacs in one or both lungs, causing them to fill with fluid or
+                pus.
               </p>
             </li>
             <li>
               <p>
-                <strong>Alopecia:</strong> sudden hair loss linked to endocrine
-                imbalances.
-              </p>
-            </li>
-            <li>
-              <p>
-                <strong>Obesity:</strong> Body Mass Index (BMI) indicators
-                correlating heavily with insulin resistance.
+                <strong>Pneumothorax:</strong> occurs when air leaks into the
+                pleural space—the thin, fluid-filled area between your lung and
+                your chest wall.
               </p>
             </li>
           </ul>
@@ -137,13 +142,9 @@ export default function About() {
       <div>
         <h3>About the model</h3>
         <p>
-          The <code>RandomForestClassifier</code> emerged as the optimal model,
-          demonstrating superior metrics across <strong>Accuracy</strong>,{" "}
-          <strong>Precision</strong>, <strong>Recall</strong>, and{" "}
-          <strong>F1-Score</strong>. The ensemble nature of Random Forest makes
-          it exceptionally resilient to the noisy clinical variances found in
-          patient symptom reporting. The final, optimized end-to-end pipeline
-          was saved as <code>diabetes_model.joblib</code>.
+          We have tested differents <code>tensors</code> architetures, and we
+          have decided that <code>EfficientNetB2</code> was light and strong
+          enough to create great results maintaining low costs.
         </p>
         <div>
           <h4>Serverless Cloud Infrastructure on AWS</h4>

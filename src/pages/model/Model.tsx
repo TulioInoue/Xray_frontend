@@ -1,208 +1,195 @@
-import style from "./Model.module.css";
+import { useState, type ChangeEvent, type FormEvent } from "react";
 
-import DonutChart from "../../components/graphs/Donut";
-import Loading from "../../components/loading/Loading";
-import StandardInput from "../../components/standardInput/StandardInput";
-import CheckInput from "../../components/checkInput/CheckInput";
-import Alert from "../../components/alert/Alert";
-import Modal from "../../components/modal/Modal";
-
-import { useState } from "react";
-import { formState, formErrorState, questions } from "./model_questions";
+interface PredictionResponse {
+  classe_predita: number;
+  probabilidades: number[];
+}
 
 export default function Model() {
-  // Defining standard states variables:
-  const [showAlert, setShowAlert] = useState<boolean>(false);
-  const [formError, setFormError] = useState(formErrorState);
-  const [loading, setLoading] = useState<boolean>();
-  const [form, setForm] = useState(formState);
-  const [alert, setAlert] = useState<{
-    type: "success" | "error";
-    text: string;
-  }>({ text: "", type: "error" });
+  const [image, setImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [result, setResult] = useState<PredictionResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  // Defining fetch result:
-  const [predictionResult, setPredictionResult] = useState<
-    | {
-        name: string;
-        value: number;
-        color: string;
-      }[]
-    | null
-  >(null);
+  // Substitua pela URL da sua Function URL ou do seu API Gateway da AWS
+  const LAMBDA_URL = import.meta.env.VITE_URL_API;
+  
 
-  function handleOnChangeForm(
-    value: string | boolean,
-    variable: keyof typeof form,
-  ) {
-    setForm((current) => {
-      let newValue: any = value;
-      if (newValue === "true") newValue = true;
-      if (newValue === "false") newValue = false;
+  // Controla a seleção da imagem e gera um preview visual
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
+      setResult(null);
+      setError(null);
+    }
+  };
 
-      return {
-        ...current,
-        [variable]: newValue,
+  // Função auxiliar para converter o arquivo em string Base64
+  const convertToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        // O readAsDataURL vem com o prefixo "data:image/jpeg;base64,", precisamos extrair apenas o hash
+        const base64String = (reader.result as string).split(",")[1];
+        resolve(base64String);
       };
+      reader.onerror = (err) => reject(err);
     });
-  }
+  };
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
-    if (formError.age || formError.height || formError.weight) {
-      setAlert({ text: "Fields must be filled correctly", type: "error" });
-      setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 5000);
+    if (!image) {
+      setError("Por favor, selecione uma imagem primeiro.");
       return;
     }
 
     setLoading(true);
-
-    const payload = {
-      ...form,
-      obesity: +form.weight / (+form["height"]) ** 2 >= 30,
-    };
-
-    const API_URL = import.meta.env.VITE_API_URL;
+    setError(null);
 
     try {
-      const response = await fetch(API_URL, {
+      // 1. Converte a imagem para Base64
+      const base64Image = await convertToBase64(image);
+
+      // 2. Envia para a AWS Lambda conforme a estrutura que o back espera
+      const response = await fetch(LAMBDA_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          image: base64Image,
+        }),
       });
 
-      if (!response.ok) throw new Error("Erro na predição");
-
       const data = await response.json();
-      setPredictionResult([
-        {
-          name: "diabetes",
-          value: data.percentage,
-          color: "#c56715",
-        },
-        {
-          name: "healthy",
-          value: 1 - data.percentage,
-          color: "#1c3148",
-        },
-      ]);
+
+      if (!response.ok) {
+        throw new Error(data.error || "Erro ao processar a imagem na AWS.");
+      }
+
+      // 3. Salva o resultado retornado pela Lambda
+      setResult(data as PredictionResponse);
+    } catch (err: any) {
+      setError(err.message || "Erro de conexão com o servidor.");
+    } finally {
       setLoading(false);
-    } catch (error) {
-      setLoading(false);
-      setAlert({ text: "An unknow error occurred", type: "error" });
-      setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 5000);
-      console.error("Erro ao conectar com a API:", error);
     }
-  }
+  };
 
   return (
-    <>
-      {showAlert && <Alert type={alert.type} text={alert.text} />}
-      {loading && <Loading />}
-      {predictionResult && (
-        <Modal onClickFunction={() => setPredictionResult(null)}>
-          <DonutChart
-            data={predictionResult}
-            fontsize={24}
-            title="Diabetes probability"
-            color={["#1c3148", "#c56715"]}
-            titleColor="#212529"
-            tooltipBackground="#717a83"
+    <div
+      style={{
+        maxWidth: "500px",
+        margin: "40px auto",
+        padding: "20px",
+        fontFamily: "sans-serif",
+        border: "1px solid #ccc",
+        borderRadius: "8px",
+      }}
+    >
+      <h2>Classificador de Raio-X</h2>
+
+      <form onSubmit={handleSubmit}>
+        <div style={{ marginBottom: "15px" }}>
+          <label
+            htmlFor="file-upload"
+            style={{
+              display: "block",
+              marginBottom: "8px",
+              fontWeight: "bold",
+            }}
+          >
+            Selecione a imagem do Raio-X:
+          </label>
+          <input
+            id="file-upload"
+            type="file"
+            accept="image/jpeg, image/png"
+            onChange={handleImageChange}
           />
-        </Modal>
-      )}
-      <section id={style.model}>
-        <div className={style.model__header}>
-          <h2>Submit your answer</h2>
-          <p>
-            *This form is for demonstration purposes only and should not be
-            taken seriously. The diagnosis cannot replace a medical opinion.
-          </p>
-          <hr />
         </div>
-        <form onSubmit={handleSubmit} className={style.form}>
-          <div className={style.model__inputs}>
-            <StandardInput
-              icon="fi fi-ss-age-alt"
-              label="Age:"
-              type="number"
-              placeholder="0"
-              onChangeFunction={(e) => {
-                const validation = +e.currentTarget.value < 0;
-                setFormError((current) => {
-                  const newCurrent = { ...current };
-                  newCurrent["age"] = validation;
-                  return newCurrent;
-                });
-                handleOnChangeForm(e.currentTarget.value, "age");
-              }}
-              handleError={(e) => {
-                const validation = +e.currentTarget.value < 0;
-                return validation ? "Value should be positive" : "";
-              }}
-            />
-            <StandardInput
-              icon="fi fi-ss-text-height"
-              label="Height (m):"
-              type="number"
-              step="0.01"
-              placeholder="0.00"
-              onChangeFunction={(e) => {
-                const validation = +e.currentTarget.value < 0;
-                setFormError((current) => {
-                  const newCurrent = { ...current };
-                  newCurrent["height"] = validation;
-                  return newCurrent;
-                });
-                handleOnChangeForm(e.currentTarget.value, "height");
-              }}
-              handleError={(e) => {
-                const validation = +e.currentTarget.value < 0;
-                return validation ? "Value should be positive" : "";
-              }}
-            />
-            <StandardInput
-              icon="fi fi-ss-scale"
-              label="Weight (kg):"
-              type="number"
-              step="0.01"
-              placeholder="0.00"
-              onChangeFunction={(e) => {
-                const validation = +e.currentTarget.value < 0;
-                setFormError((current) => {
-                  const newCurrent = { ...current };
-                  newCurrent["weight"] = validation;
-                  return newCurrent;
-                });
-                handleOnChangeForm(e.currentTarget.value, "weight");
-              }}
-              handleError={(e) => {
-                const validation = +e.currentTarget.value < 0;
-                return validation ? "Value should be positive" : "";
+
+        {preview && (
+          <div style={{ marginBottom: "15px" }}>
+            <img
+              src={preview}
+              alt="Preview"
+              style={{
+                width: "100%",
+                maxHeight: "300px",
+                objectFit: "contain",
+                borderRadius: "4px",
               }}
             />
           </div>
-          {questions.map((question, key) => (
-            <CheckInput
-              key={key}
-              label={question.text}
-              options={question.options}
-              onClickFunction={(e) =>
-                handleOnChangeForm(e.currentTarget.value, question.target)
-              }
-            />
-          ))}
+        )}
 
-          <button type="submit" className={style.model__button}>
-            Check
-          </button>
-        </form>
-      </section>
-    </>
+        <button
+          type="submit"
+          disabled={loading}
+          style={{
+            width: "100%",
+            padding: "10px",
+            backgroundColor: loading ? "#ccc" : "#007bff",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: loading ? "not-allowed" : "pointer",
+            fontSize: "16px",
+          }}
+        >
+          {loading ? "Processando Inferência..." : "Enviar para Análise"}
+        </button>
+      </form>
+
+      {error && (
+        <div
+          style={{
+            marginTop: "20px",
+            padding: "10px",
+            backgroundColor: "#f8d7da",
+            color: "#721c24",
+            borderRadius: "4px",
+          }}
+        >
+          <strong>Erro:</strong> {error}
+        </div>
+      )}
+
+      {result && (
+        <div
+          style={{
+            marginTop: "20px",
+            padding: "15px",
+            backgroundColor: "#d4edda",
+            color: "#155724",
+            borderRadius: "4px",
+          }}
+        >
+          <h3>Resultado da Análise:</h3>
+          <p>
+            <strong>Classe Predita:</strong>{" "}
+            {result.classe_predita === 0
+              ? "Normal (0)"
+              : "Pneumonia / Alteração (1)"}
+          </p>
+          <p>
+            <strong>Probabilidades:</strong>
+          </p>
+          <ul>
+            {result.probabilidades.map((prob, idx) => (
+              <li key={idx}>
+                Classe {idx}: {(prob * 100).toFixed(2)}%
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
   );
 }

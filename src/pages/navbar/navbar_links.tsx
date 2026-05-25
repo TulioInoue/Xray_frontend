@@ -1,4 +1,4 @@
-export const title = "diabetes classification";
+export const title = "X-ray classification";
 
 export const navlinks = [
   {
@@ -27,6 +27,11 @@ export const navlinks = [
         path: "/training",
         pathName: "training",
         icon: "fi fi-ss-machine-learning",
+      },
+      {
+        path: "/testing",
+        pathName: "testing",
+        icon: "fi fi-ss-blood-test-tube-alt",
       },
     ],
   },
