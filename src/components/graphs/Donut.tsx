@@ -50,7 +50,8 @@ export default function DonutChart({
     series: [
       {
         type: "pie",
-        radius: ["40%", "80%"],
+        top: "0%",
+        radius: ["35%", "70%"],
         avoidLabelOverlap: false,
         itemStyle: {
           borderRadius: 0,

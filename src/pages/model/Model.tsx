@@ -1,8 +1,18 @@
+import style from "./Model.module.css";
+
 import { useState, type ChangeEvent, type FormEvent } from "react";
 
+import Loading from "../../components/loading/Loading";
+import Alert from "../../components/alert/Alert";
+import Modal from "../../components/modal/Modal";
+import DonutChart from "../../components/graphs/Donut";
+
 interface PredictionResponse {
-  classe_predita: number;
-  probabilidades: number[];
+  data: {
+    name: string;
+    value: number;
+    color: string;
+  }[];
 }
 
 export default function Model() {
@@ -14,7 +24,6 @@ export default function Model() {
 
   // Substitua pela URL da sua Function URL ou do seu API Gateway da AWS
   const LAMBDA_URL = import.meta.env.VITE_URL_API;
-  
 
   // Controla a seleção da imagem e gera um preview visual
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -44,12 +53,12 @@ export default function Model() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!image) {
-      setError("Por favor, selecione uma imagem primeiro.");
+      setError("Insert image first.");
+      setTimeout(() => setError(null), 5000);
       return;
     }
 
     setLoading(true);
-    setError(null);
 
     try {
       // 1. Converte a imagem para Base64
@@ -68,128 +77,70 @@ export default function Model() {
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || "Erro ao processar a imagem na AWS.");
-      }
+      if (!response.ok) return;
 
-      // 3. Salva o resultado retornado pela Lambda
+      console.log("data:", data);
+
       setResult(data as PredictionResponse);
     } catch (err: any) {
-      setError(err.message || "Erro de conexão com o servidor.");
+      console.log(err);
+      setError("could not find response");
+      setTimeout(() => setError(null), 5000);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div
-      style={{
-        maxWidth: "500px",
-        margin: "40px auto",
-        padding: "20px",
-        fontFamily: "sans-serif",
-        border: "1px solid #ccc",
-        borderRadius: "8px",
-      }}
-    >
-      <h2>Classificador de Raio-X</h2>
+    <>
+      {error && <Alert type="error" text={error} />}
+      {loading && <Loading />}
 
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: "15px" }}>
-          <label
-            htmlFor="file-upload"
-            style={{
-              display: "block",
-              marginBottom: "8px",
-              fontWeight: "bold",
-            }}
-          >
-            Selecione a imagem do Raio-X:
-          </label>
-          <input
-            id="file-upload"
-            type="file"
-            accept="image/jpeg, image/png"
-            onChange={handleImageChange}
-          />
+      <section id={style.model}>
+        <div className={style.model__header}>
+          <h2>X-ray chest classification</h2>
+          <hr />
         </div>
-
-        {preview && (
-          <div style={{ marginBottom: "15px" }}>
-            <img
-              src={preview}
-              alt="Preview"
-              style={{
-                width: "100%",
-                maxHeight: "300px",
-                objectFit: "contain",
-                borderRadius: "4px",
-              }}
-            />
+        <div className={style.model__content}>
+          <form onSubmit={handleSubmit} className={style.model__content__form}>
+            <div className={style.model__content__form_input}>
+              <div>
+                <p>Select a X-ray chest-file:</p>
+                <label htmlFor="file-upload">upload</label>
+              </div>
+              <input
+                style={{ display: "none" }}
+                id="file-upload"
+                type="file"
+                accept="image/jpeg, image/png"
+                onChange={handleImageChange}
+              />
+            </div>
+            <div className={style.model__content__form_image}>
+              {preview ? (
+                <img src={preview} alt="Preview" />
+              ) : (
+                <p>No image selected</p>
+              )}
+            </div>
+            <button type="submit" disabled={loading}>
+              {loading ? "Processing..." : "Send to analysis"}
+            </button>
+          </form>
+          <div id={style.model__content__result}>
+            {result && (
+              <DonutChart
+                data={result.data}
+                color={result.data.map((e) => e.color)}
+                fontsize={20}
+                title={"X-ray prediction".toUpperCase()}
+                titleColor="#212529"
+                tooltipBackground="#717a83"
+              />
+            )}
           </div>
-        )}
-
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            width: "100%",
-            padding: "10px",
-            backgroundColor: loading ? "#ccc" : "#007bff",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: loading ? "not-allowed" : "pointer",
-            fontSize: "16px",
-          }}
-        >
-          {loading ? "Processando Inferência..." : "Enviar para Análise"}
-        </button>
-      </form>
-
-      {error && (
-        <div
-          style={{
-            marginTop: "20px",
-            padding: "10px",
-            backgroundColor: "#f8d7da",
-            color: "#721c24",
-            borderRadius: "4px",
-          }}
-        >
-          <strong>Erro:</strong> {error}
         </div>
-      )}
-
-      {result && (
-        <div
-          style={{
-            marginTop: "20px",
-            padding: "15px",
-            backgroundColor: "#d4edda",
-            color: "#155724",
-            borderRadius: "4px",
-          }}
-        >
-          <h3>Resultado da Análise:</h3>
-          <p>
-            <strong>Classe Predita:</strong>{" "}
-            {result.classe_predita === 0
-              ? "Normal (0)"
-              : "Pneumonia / Alteração (1)"}
-          </p>
-          <p>
-            <strong>Probabilidades:</strong>
-          </p>
-          <ul>
-            {result.probabilidades.map((prob, idx) => (
-              <li key={idx}>
-                Classe {idx}: {(prob * 100).toFixed(2)}%
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
+      </section>
+    </>
   );
 }
