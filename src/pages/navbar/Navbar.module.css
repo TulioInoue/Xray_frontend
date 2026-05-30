@@ -8,6 +8,7 @@
   color: var(--text-light-color);
   z-index: 2;
   box-shadow: 5px 0px 5px gray;
+  overflow-y: auto;
 }
 
 .main__navbar_header {

@@ -4,7 +4,6 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 
 import Loading from "../../components/loading/Loading";
 import Alert from "../../components/alert/Alert";
-import Modal from "../../components/modal/Modal";
 import DonutChart from "../../components/graphs/Donut";
 
 interface PredictionResponse {
@@ -78,9 +77,7 @@ export default function Model() {
       const data = await response.json();
 
       if (!response.ok) return;
-
-      console.log("data:", data);
-
+      
       setResult(data as PredictionResponse);
     } catch (err: any) {
       console.log(err);
