@@ -12,7 +12,7 @@ export default function About() {
         <p>
           By utilizing a public clinical dataset from{" "}
           <a
-            href="https://www.kaggle.com/datasets/nih-chest-xrays/data"
+            href="https://www.kaggle.com/datasets/tawsifurrahman/covid19-radiography-database"
             target="_blank"
           >
             Kaggle
@@ -28,112 +28,53 @@ export default function About() {
         <h3>Dataset and Clinical Context</h3>
         <p>
           The foundational backbone of this predictive system is the{" "}
-          <strong>NIH Chest X-rays</strong>, sourced from the{" "}
+          <strong>COVID-19 Radiography Database</strong>, sourced from the{" "}
           <a
-            href="https://www.kaggle.com/datasets/nih-chest-xrays/data"
+            href="https://www.kaggle.com/datasets/tawsifurrahman/covid19-radiography-database"
             target="_blank"
           >
             Kaggle
           </a>{" "}
           repository. The dataset contains clinical x-ray images from patients
-          suffering from 14 differents classes:
+          suffering from 4 differents classes:
         </p>
         <div>
           <img src="/images/diagnosis.png" alt="x-ray classes" />
         </div>
+        <p>The dataset also offers all kinds of masks for each chest X-ray:</p>
+        <div>
+          <img src="/images/masks.png" alt="masks" />
+        </div>
         <div>
           <h4>Feature Inventory</h4>
           <p>
-            The model evaluates images and evaluates 13 differents diagnosis:
+            The model evaluates images and evaluates 4 differents diagnosis:
           </p>
           <ul>
             <li>
               <p>
-                <strong>Atelectasis:</strong> partial or complete collapse of a
-                lung or a specific section (lobe) of a lung.
+                <strong>Covid:</strong> it spreads primarily through the air via
+                respiratory droplets and aerosols when infected people cough,
+                sneeze, talk, or breathe.
               </p>
             </li>
             <li>
               <p>
-                <strong>Cardiomegaly:</strong> it is not a disease itself, but
-                rather a sign of an underlying condition that forces the heart
-                to work harder or causes the heart muscle to stretch and
-                thicken.
+                <strong>Lung Opacity:</strong> is a radiological term used to
+                describe any area in the lung that appears whiter, hazy, or
+                cloudy on an X-ray or CT scan.
               </p>
             </li>
             <li>
               <p>
-                <strong>Consolidation:</strong> a lung condition where normally
-                air-filled lung tissue becomes stiff and filled with fluid,
-                cells, or pus.
+                <strong>Normal:</strong> an healthy example of a chest X-ray.
               </p>
             </li>
             <li>
               <p>
-                <strong>Edema:</strong> a serious medical condition
-                characterized by an abnormal buildup of excess fluid in the
-                lungs' air sacs (alveoli).
-              </p>
-            </li>
-            <li>
-              <p>
-                <strong>Effusion:</strong> abnormal buildup of excess fluid in
-                the space between your lungs and your chest cavity.
-              </p>
-            </li>
-            <li>
-              <p>
-                <strong>Emphysema:</strong> a chronic, progressive lung disease
-                where the tiny air sacs (alveoli) in your lungs are permanently
-                damaged and destroyed.
-              </p>
-            </li>
-            <li>
-              <p>
-                <strong>Fibrosis:</strong> a progressive lung disease
-                characterized by irreversible scarring (fibrosis) of the tissue
-                between the air sacs in the lungs.
-              </p>
-            </li>
-            <li>
-              <p>
-                <strong>Infiltration:</strong> an accumulation of abnormal
-                substances—such as fluid, pus, blood, immune cells, or
-                proteins—in the air sacs and tissues of the lungs.
-              </p>
-            </li>
-            <li>
-              <p>
-                <strong>Mass:</strong> an abnormal growth or lesion inside the
-                lung that measures larger than 3 centimeters (about 1.2 inches)
-                in diameter.
-              </p>
-            </li>
-            <li>
-              <p>
-                <strong>Nodule:</strong> a small, round, or oval-shaped abnormal
-                growth of tissue in the lung. Often called a "spot on the lung,"
-                it typically measures or less in diameter.
-              </p>
-            </li>
-            <li>
-              <p>
-                <strong>Pleural Thickening:</strong> is the scarring, hardening,
-                or inflammation of the pleura.
-              </p>
-            </li>
-            <li>
-              <p>
-                <strong>Pneumonia:</strong> an infection that inflames the air
-                sacs in one or both lungs, causing them to fill with fluid or
-                pus.
-              </p>
-            </li>
-            <li>
-              <p>
-                <strong>Pneumothorax:</strong> occurs when air leaks into the
-                pleural space—the thin, fluid-filled area between your lung and
-                your chest wall.
+                <strong>Viral Pneumonia:</strong> an infection that inflames the
+                air sacs in one or both lungs, causing them to fill with fluid
+                or pus.
               </p>
             </li>
           </ul>
